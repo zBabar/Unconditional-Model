@@ -65,11 +65,12 @@ def all_scores(trues, pred, n=4):
   else:
     preds = dict([(i,[r]) for i,r in enumerate(pred)])
   bleus, _ = Bleu(n).compute_score(trues,preds)
-  with closing(Meteor()) as meteor_runtime:
-    meteor, _ = meteor_runtime.compute_score(trues,preds)
+  #with closing(Meteor()) as meteor_runtime:
+  #meteor, _ = Meteor().compute_score(trues,preds)
+  meteor=0.0
   rouge, _ = Rouge().compute_score(trues,preds)
   ciders, _ = Cider().compute_score(trues,preds)
-  return bleus + [meteor, rouge] + ciders
+  return bleus,meteor, rouge, ciders
 
 def cider_scores(trues, pred, n=4):
   """
@@ -370,15 +371,14 @@ def pairwise_bleu_scores(reports, pred_reports, max_n=4):
 def slow_pairwise_bleu_scores(reports, pred_reports, n=4):
   return np.array([bleu_scores(reports, pred, n) for pred in pred_reports])
 
-def find_best_report_bleu(reports, pred_reports=None, n=4):
+def find_best_report_bleu(reports, pred_reports, n=4):
   """
   Find the single report among `pred_reports`, that has the highest BLEU-`n` on `reports`.
   """
-  if pred_reports == None:
-    pred_reports = reports
   bleus = pairwise_bleu_scores(reports, pred_reports, n)
   best = np.argmax(bleus[:,n-1])
-  return pred_reports[best]
+
+  return pred_reports[best],best,bleus[best,:]
 
 def upper_bound_bleu_score(reports, length=None, max_n=4):
   """ Upper bound on BLEU score for a single report """
@@ -488,12 +488,10 @@ def pairwise_cider_scores(reports, pred_reports, max_n=4):
 def slow_pairwise_cider_scores(reports, pred_reports):
   return np.array([cider_scores(reports, pred) for pred in pred_reports])
 
-def find_best_report_cider(reports, pred_reports = None):
+def find_best_report_cider(reports, pred_reports):
   """
   Find the single report among `pred_reports`, that has the highest CIDEr (not CIDEr-D) on `reports`.
   """
-  if pred_reports == None:
-    pred_reports = reports
   ciders = pairwise_cider_scores(reports, pred_reports)
   best = np.argmax(ciders)
   return pred_reports[best]
@@ -530,6 +528,7 @@ def train_test_split(n, train_fraction=0.8, seed=1):
   test  = perm[num_train:]
   return train,test
 
+
 def cross_validate(data, method, seed=1, folds=10):
   rng = np.random.RandomState(seed)
   n = len(data)
@@ -545,7 +544,7 @@ def cross_validate_scores(data, method, **args):
   scores = cross_validate(data, lambda train,test: all_scores(test, method(train)), **args)
   return np.array(scores)
 
-def cross_validate_with_idx(data, method, seed=1, folds=10, verbose=False):
+def cross_validate_with_idx(data, method, seed=1, folds=10):
   rng = np.random.RandomState(seed)
   n = len(data)
   perm = rng.permutation(n)
@@ -553,9 +552,6 @@ def cross_validate_with_idx(data, method, seed=1, folds=10, verbose=False):
   for i in range(folds):
     test  = perm[(i*n)//folds:((i+1)*n)//folds]
     train = [*perm[0:(i*n)//folds], *perm[((i+1)*n)//folds:]]
-    result = method(data,train,test)
-    if verbose:
-      print(result)
-    results.append(result)
+    results.append(method(data,train,test))
   return results
 
