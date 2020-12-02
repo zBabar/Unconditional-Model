@@ -1,24 +1,32 @@
+"""
+Uncomment the code snippet as per needed 
+"""
+
 import numpy as np
 import pandas as pd
 import baselines as b
 import pickle as pkl
 
 
+########################### IU Chest Xray dataset
+# with open('/media/zaheer/Data/Image_Text_Datasets/IU_Xray/latest/Two_Images/SAT_Findings/word/Sample1/train/train.annotations.pkl', 'rb') as f:
+#     reports = pkl.load(f,encoding='latin-1')
 
-with open('/media/zaheer/Data/Image_Text_Datasets/IU_Xray/latest/Two_Images/SAT_Findings/word/Sample1/train/train.annotations.pkl', 'rb') as f:
-    reports = pkl.load(f,encoding='latin-1')
+# with open('/media/zaheer/Data/Image_Text_Datasets/IU_Xray/latest/Two_Images/SAT_Findings/word/Sample1/test/test.annotations.pkl', 'rb') as f:
 
-with open('/media/zaheer/Data/Image_Text_Datasets/IU_Xray/latest/Two_Images/SAT_Findings/word/Sample1/test/test.annotations.pkl', 'rb') as f:
+#     test_reports = pkl.load(f,encoding='latin-1')
 
-    test_reports = pkl.load(f,encoding='latin-1')
+# with open('/media/zaheer/Data/Image_Text_Datasets/IU_Xray/latest/Two_Images/word/impression_first/Sample1/test/test.annotations.pkl', 'rb') as f1:
+#     test_reports = pkl.load(f1,encoding='latin-1')
 
-with open('/media/zaheer/Data/Image_Text_Datasets/IU_Xray/latest/Two_Images/word/impression_first/Sample1/test/test.annotations.pkl', 'rb') as f1:
-    test_reports = pkl.load(f1,encoding='latin-1')
+reports=pd.read_csv('train.csv')
+test_reports=pd.read_csv('train.csv')
 
 #print(test_reports)
 """"
 scores=[]
 
+##################### Baseline 1
 max_score=0
 data=pd.DataFrame([])
 for r in list(reports['caption']):
@@ -43,20 +51,25 @@ data['cand']=[report]*reports.shape[0]
 data['reports']=list(reports['caption'])
 print(b.all_scores(data['reports'],data['cand']))
 """
-# report=b.optimal_report_bleu2(reports['caption'])
-# report='of the heart size and pulmonary xxxx are clear there is in the lungs are within normal limits no pneumothorax no focal airspace disease of the cardiomediastinal silhouette is no acute cardiopulmonary abnormality consolidation pleural effusion or mediastinal'
-# #report=' '.join(report)
-# print(report)
-# data=pd.DataFrame([])
-# data['cand']=[report]*test_reports.shape[0]
-#
-# data['reports']=list(test_reports['caption'])
-# print(b.all_scores(data['reports'],data['cand']))
 
+##################### Baseline 2
+"""
+report=b.optimal_report_bleu2(reports['caption'])
+report='of the heart size and pulmonary xxxx are clear there is in the lungs are within normal limits no pneumothorax no focal airspace disease of the cardiomediastinal silhouette is no acute cardiopulmonary abnormality consolidation pleural effusion or mediastinal'
+#report=' '.join(report)
+print(report)
+data=pd.DataFrame([])
+data['cand']=[report]*test_reports.shape[0]
+
+data['reports']=list(test_reports['caption'])
+print(b.all_scores(data['reports'],data['cand']))
+"""
 
 
 
 ################# MIMIC CXR
+
+"""
 
 import re
 
@@ -86,7 +99,7 @@ for inst in data:
 
 
 
-random_lst=random_lst[:20000]
+random_lst=random_lst[:20000] # considering estimated one fold of the dataset as dataset
 
 
 
@@ -105,3 +118,4 @@ data=pd.DataFrame([])
 #data['reports']=random_lst
 #print(b.all_scores(data['reports'],data['cand']))
 print(b.all_scores(random_lst,report))
+"""
