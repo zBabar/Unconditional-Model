@@ -20,42 +20,29 @@ import pickle as pkl
 #     test_reports = pkl.load(f1,encoding='latin-1')
 
 reports=pd.read_csv('train.csv')
-test_reports=pd.read_csv('train.csv')
+test_reports=pd.read_csv('test.csv')
 
 #print(test_reports)
 """"
 scores=[]
 
 ##################### Baseline 1
-max_score=0
+
 data=pd.DataFrame([])
-for r in list(reports['caption']):
-
-    data['cand']=[r]*reports.shape[0]
-    data['reports']=list(reports['caption'])
-    bleus,meteor, rouge, ciders=b.all_scores(data['reports'],data['cand'])
-
-    if bleus[3]>max_score:
-        max_score=bleus[3]
-        print(bleus,meteor, rouge, ciders)
-        print(r)
-
-print(reports['caption'][0])
-
 
 report,idx,bleus=b.find_best_report_bleu(list(reports['caption']),list(reports['caption']))
 print(report,bleus)
 data=pd.DataFrame([])
-data['cand']=[report]*reports.shape[0]
+data['cand']=[report]*test_reports.shape[0]
 
-data['reports']=list(reports['caption'])
+data['reports']=list(test_reports['caption'])
 print(b.all_scores(data['reports'],data['cand']))
 """
 
 ##################### Baseline 2
 """
 report=b.optimal_report_bleu2(reports['caption'])
-report='of the heart size and pulmonary xxxx are clear there is in the lungs are within normal limits no pneumothorax no focal airspace disease of the cardiomediastinal silhouette is no acute cardiopulmonary abnormality consolidation pleural effusion or mediastinal'
+#report='of the heart size and pulmonary xxxx are clear there is in the lungs are within normal limits no pneumothorax no focal airspace disease of the cardiomediastinal silhouette is no acute cardiopulmonary abnormality consolidation pleural effusion or mediastinal'
 #report=' '.join(report)
 print(report)
 data=pd.DataFrame([])
@@ -73,7 +60,7 @@ print(b.all_scores(data['reports'],data['cand']))
 
 import re
 
-data=pd.read_csv('/home/zaheer/pythonCode/MIMIC_CXR/processed_data.csv')
+data=pd.read_csv('./data/processed_data_mimic_cxr.csv')
 
 print(type(data.findings[0]))
 
