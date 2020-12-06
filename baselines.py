@@ -66,8 +66,8 @@ def all_scores(trues, pred, n=4):
     preds = dict([(i,[r]) for i,r in enumerate(pred)])
   bleus, _ = Bleu(n).compute_score(trues,preds)
   #with closing(Meteor()) as meteor_runtime:
-  #meteor, _ = Meteor().compute_score(trues,preds)
-  meteor=0.0
+  meteor, _ = Meteor().compute_score(trues,preds)
+  #meteor=0.0
   rouge, _ = Rouge().compute_score(trues,preds)
   ciders, _ = Cider().compute_score(trues,preds)
   return bleus,meteor, rouge, ciders
